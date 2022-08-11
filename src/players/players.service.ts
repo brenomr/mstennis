@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePlayerDto } from './dtos/player.dto';
 import { IPlayer } from './interfaces/players.interface';
 import { v4 as uuid } from 'uuid';
@@ -13,6 +13,26 @@ export class PlayersService {
 
     this.create(playerData);
 
+    return this.players;
+  }
+
+  async deletePlayer(email: string): Promise<void> {
+    const foundPlayer = await this.getPlayer(email);
+    this.players = this.players.filter(
+      (player) => player.email !== foundPlayer.email,
+    );
+  }
+
+  async getPlayer(email: string): Promise<IPlayer> {
+    const foundPlayer = await this.players.find(
+      (player) => player.email === email,
+    );
+    if (!foundPlayer)
+      throw new NotFoundException(`Player with e-mail: ${email} not found!`);
+    return foundPlayer;
+  }
+
+  async listPlayers(): Promise<IPlayer[]> {
     return this.players;
   }
 
