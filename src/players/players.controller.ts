@@ -7,7 +7,7 @@ export class PlayersController {
   constructor(private readonly playerService: PlayersService) {}
 
   @Post()
-  async createAndUpdatePlayer(@Body() playerData: CreatePlayerDto) {
+  async createUpdatePlayer(@Body() playerData: CreatePlayerDto) {
     return this.playerService.createUpdatePlayer(playerData);
   }
 
