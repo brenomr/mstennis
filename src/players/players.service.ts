@@ -1,54 +1,62 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePlayerDto } from './dtos/player.dto';
 import { IPlayer } from './interfaces/players.interface';
-import { v4 as uuid } from 'uuid';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class PlayersService {
-  private readonly logger = new Logger(PlayersService.name);
-  private players: IPlayer[] = [];
+  constructor(
+    @InjectModel('Player')
+    private readonly playerModel: Model<IPlayer>,
+  ) {}
 
-  async createUpdatePlayer(playerData: CreatePlayerDto): Promise<IPlayer[]> {
-    this.logger.log(`playerData: ${playerData}`);
+  async createUpdatePlayer(playerData: CreatePlayerDto): Promise<IPlayer> {
+    try {
+      const { email } = playerData;
 
-    this.create(playerData);
+      const foundPlayer = await this.playerModel.findOne({ email }).exec();
 
-    return this.players;
+      if (!foundPlayer) {
+        await this.create(playerData);
+      } else {
+        return await this.update(playerData);
+      }
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Email or phoneNumber already exists!');
+    }
   }
 
   async deletePlayer(email: string): Promise<void> {
-    const foundPlayer = await this.getPlayer(email);
-    this.players = this.players.filter(
-      (player) => player.email !== foundPlayer.email,
-    );
+    await this.getPlayer(email);
+    await this.playerModel.remove({ email }).exec();
   }
 
   async getPlayer(email: string): Promise<IPlayer> {
-    const foundPlayer = await this.players.find(
-      (player) => player.email === email,
-    );
+    const foundPlayer = await this.playerModel.findOne({ email }).exec();
     if (!foundPlayer)
       throw new NotFoundException(`Player with e-mail: ${email} not found!`);
     return foundPlayer;
   }
 
   async listPlayers(): Promise<IPlayer[]> {
-    return this.players;
+    return await this.playerModel.find().exec();
   }
 
-  private create(playerData: CreatePlayerDto): void {
-    const { name, phoneNumber, email } = playerData;
+  private async create(playerData: CreatePlayerDto): Promise<IPlayer> {
+    const createdPlayer = new this.playerModel(playerData);
+    return await createdPlayer.save();
+  }
 
-    const newPlayer: IPlayer = {
-      _id: uuid(),
-      name,
-      phoneNumber,
-      email,
-      ranking: 'A',
-      positionRanking: 2,
-      urlPhotoPlayer: 'https://www.google.com',
-    };
-
-    this.players.push(newPlayer);
+  private async update(playerData: CreatePlayerDto): Promise<IPlayer> {
+    const { email } = playerData;
+    return await this.playerModel
+      .findOneAndUpdate({ email }, { $set: playerData }, { new: true })
+      .exec();
   }
 }
