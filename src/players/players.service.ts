@@ -33,8 +33,10 @@ export class PlayersService {
   }
 
   async deletePlayer(email: string): Promise<void> {
-    await this.getPlayer(email);
-    await this.playerModel.remove({ email }).exec();
+    const result = await this.playerModel.count({ email }).exec();
+    if (!result)
+      throw new NotFoundException(`Player with e-mail: ${email} not found!`);
+    await this.playerModel.deleteOne({ email }).exec();
   }
 
   async getPlayer(email: string): Promise<IPlayer> {
