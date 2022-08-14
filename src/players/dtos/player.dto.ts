@@ -10,3 +10,11 @@ export class CreatePlayerDto {
   @IsNotEmpty()
   readonly name: string;
 }
+
+export class UpdatePlayerDto {
+  @IsNotEmpty()
+  readonly phoneNumber: string;
+
+  @IsNotEmpty()
+  readonly name: string;
+}

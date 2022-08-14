@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CreatePlayerDto } from './dtos/player.dto';
+import { CreatePlayerDto, UpdatePlayerDto } from './dtos/player.dto';
 import { PlayersService } from './players.service';
 
 @Controller('api/v1/players')
@@ -22,7 +22,7 @@ export class PlayersController {
   @Put('/:_id')
   async updatePlayer(
     @Param('_id') _id: string,
-    @Body() playerData: CreatePlayerDto,
+    @Body() playerData: UpdatePlayerDto,
   ) {
     return this.playerService.updatePlayer(_id, playerData);
   }
