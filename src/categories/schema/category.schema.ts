@@ -8,7 +8,7 @@ export const CategoriesSchema = new mongoose.Schema(
       {
         name: { type: String },
         operation: { type: String },
-        value: { type: String },
+        points: { type: String },
       },
     ],
     players: [
