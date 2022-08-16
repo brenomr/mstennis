@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PlayersModule } from './players/players.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PlayersModule } from './players/players.module';
       useUnifiedTopology: true,
     }),
     PlayersModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
