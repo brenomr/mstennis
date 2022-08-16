@@ -37,7 +37,8 @@ export class CategoriesService {
     return foundCategory;
   }
 
-  private async categoryExist(_id: string) {
-    return _id;
+  private async categoryExist(category: string) {
+    const result = await this.categoryModel.count({ category }).exec();
+    if (!result) throw new NotFoundException(`Category ${category} not found!`);
   }
 }
