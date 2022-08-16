@@ -25,4 +25,19 @@ export class CategoriesService {
     const categoryToCreate = new this.categoryModel(categoryData);
     return await categoryToCreate.save();
   }
+
+  async listCategories(): Promise<ICategory[]> {
+    return await this.categoryModel.find();
+  }
+
+  async getCategory(category: string): Promise<ICategory> {
+    const foundCategory = await this.categoryModel.findOne({ category }).exec();
+    if (!foundCategory)
+      throw new NotFoundException(`Category ${category} not found!`);
+    return foundCategory;
+  }
+
+  private async categoryExist(_id: string) {
+    return _id;
+  }
 }
