@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos/categories.dto';
+import { IAddPlayerToCategory } from './interfaces/categories.interface';
 
 @Controller('api/v1/categories')
 export class CategoriesController {
@@ -9,6 +10,11 @@ export class CategoriesController {
   @Post()
   async createCategory(@Body() categoryData: CreateCategoryDto) {
     return this.categoryService.createCategory(categoryData);
+  }
+
+  @Post('/:category/players/:idPlayer')
+  async addPlayerCategory(@Param() params: IAddPlayerToCategory) {
+    return await this.categoryService.addPlayerCategory(params);
   }
 
   @Get()

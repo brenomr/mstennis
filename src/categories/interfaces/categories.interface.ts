@@ -13,3 +13,8 @@ export interface IEvent {
   operation: string;
   value: number;
 }
+
+export interface IAddPlayerToCategory {
+  category?: string;
+  idPlayer?: any;
+}
