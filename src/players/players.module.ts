@@ -10,5 +10,6 @@ import { PlayerSchema } from './schema/players.schema';
   ],
   controllers: [PlayersController],
   providers: [PlayersService],
+  exports: [PlayersService],
 })
 export class PlayersModule {}

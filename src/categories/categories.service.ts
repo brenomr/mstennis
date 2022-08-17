@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PlayersService } from 'src/players/players.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dtos/categories.dto';
 import {
   IAddPlayerToCategory,
@@ -17,6 +18,7 @@ export class CategoriesService {
   constructor(
     @InjectModel('Category')
     private readonly categoryModel: Model<ICategory>,
+    private readonly playerService: PlayersService,
   ) {}
 
   async createCategory(categoryData: CreateCategoryDto): Promise<ICategory> {
@@ -34,14 +36,19 @@ export class CategoriesService {
     const { category, idPlayer } = params;
 
     const categoryToUpdate = await this.getCategory(category);
+    await this.playerService.getPlayer(idPlayer);
+    const playerOnGivenCategory = await this.categoryModel
+      .find({ category })
+      .where('players')
+      .in(idPlayer)
+      .exec();
 
-    if (categoryToUpdate.players.includes(idPlayer))
+    if (playerOnGivenCategory.length)
       throw new ConflictException(
         `Player with id: ${idPlayer} is already in this category.`,
       );
 
     categoryToUpdate.players.push(idPlayer);
-
     await this.updateCategory(category, categoryToUpdate);
   }
 
