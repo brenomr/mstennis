@@ -8,13 +8,13 @@ export const CategoriesSchema = new mongoose.Schema(
       {
         name: { type: String },
         operation: { type: String },
-        points: { type: String },
+        points: { type: Number },
       },
     ],
     players: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'players',
+        ref: 'Player',
       },
     ],
   },
