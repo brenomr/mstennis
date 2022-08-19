@@ -28,7 +28,7 @@ export class PlayersController {
   }
 
   @Get('/:_id')
-  async getPlayer(@Param() _id: string) {
+  async getPlayer(@Param('_id') _id: string) {
     return await this.playerService.getPlayer(_id);
   }
 
