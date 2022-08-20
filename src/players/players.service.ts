@@ -57,7 +57,7 @@ export class PlayersService {
     return await this.playerModel.find().exec();
   }
 
-  private async playerExist(_id: string) {
+  async playerExist(_id: string): Promise<void> {
     const result = await this.playerModel.count({ _id }).exec();
     if (!result)
       throw new NotFoundException(`Player with id: ${_id} not found!`);
