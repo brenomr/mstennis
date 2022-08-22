@@ -19,7 +19,9 @@ export class ChallengesService {
   async createChallenge(challengeData: CreateChallengeDto): Promise<void> {
     await this.playersExist(challengeData.players);
     this.isChallengerOnMatch(challengeData);
-    await this.checkPlayerCategory(challengeData.players);
+    const playerCategory = await this.categoryService.getCategoryByPlayerId(
+      challengeData.challenger,
+    );
   }
 
   private async playersExist(players: IPlayer[]): Promise<void> {
@@ -39,18 +41,5 @@ export class ChallengesService {
       throw new BadRequestException(
         `The challenger need to be one player of the match!`,
       );
-  }
-
-  private async checkPlayerCategory(players: IPlayer[]): Promise<ICategory[]> {
-    let categories = [];
-    await Promise.all(
-      players.map(async (player) => {
-        const result = await this.categoryService.getCategoryByPlayerId(
-          player._id,
-        );
-        categories = categories.concat(result);
-      }),
-    );
-    return categories;
   }
 }

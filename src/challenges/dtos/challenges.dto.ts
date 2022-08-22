@@ -13,7 +13,7 @@ export class CreateChallengeDto {
   readonly challengeDate: Date;
 
   @IsNotEmpty()
-  challenger: IPlayer;
+  challenger: string;
 
   @IsArray()
   @ArrayMaxSize(2)
