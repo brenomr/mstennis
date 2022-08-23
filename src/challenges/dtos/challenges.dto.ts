@@ -10,10 +10,10 @@ import { IPlayer } from 'src/players/interfaces/players.interface';
 export class CreateChallengeDto {
   @IsNotEmpty()
   @IsDateString()
-  readonly challengeDate: Date;
+  challengeDate: Date;
 
   @IsNotEmpty()
-  challenger: string;
+  challenger: IPlayer;
 
   @IsArray()
   @ArrayMaxSize(2)

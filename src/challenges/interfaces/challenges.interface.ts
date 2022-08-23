@@ -2,12 +2,20 @@ import { Document } from 'mongoose';
 import { IPlayer } from 'src/players/interfaces/players.interface';
 
 export interface IChallenge extends Document {
-  readonly challengeDate: Date;
-  status: string;
+  challengeDate: Date;
+  status: ChallengeStatus;
   requestDate: Date;
   responseDate: Date;
-  challenger: string;
+  challenger: IPlayer;
   category: string;
   players: Array<IPlayer>;
   match: string;
+}
+
+export enum ChallengeStatus {
+  DONE = 'DONE',
+  PENDING = 'PENDING',
+  ACCEPT = 'ACCEPT',
+  NEGATED = 'NEGATED',
+  CANCELED = 'CANCELED',
 }
