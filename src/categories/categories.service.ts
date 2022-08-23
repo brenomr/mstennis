@@ -63,14 +63,14 @@ export class CategoriesService {
     return foundCategory;
   }
 
-  async getCategoryByPlayerId(playerId: string): Promise<ICategory[]> {
+  async getCategoryByPlayerId(playerId: any): Promise<ICategory> {
     const foundCategory = await this.categoryModel
-      .find()
+      .findOne()
       .where('players')
       .in([playerId])
       .exec();
 
-    if (!foundCategory.length)
+    if (!foundCategory)
       throw new BadRequestException(
         `Player with id: ${playerId} don't have a category.`,
       );
