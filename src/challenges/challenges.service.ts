@@ -37,6 +37,27 @@ export class ChallengesService {
     }
   }
 
+  async getChallengesByPlayerId(playerId: string): Promise<IChallenge[]> {
+    await this.playerService.playerExist(playerId);
+    return await this.challengeModel
+      .find()
+      .where('players')
+      .in([playerId])
+      .populate('challenger')
+      .populate('players')
+      .populate('match')
+      .exec();
+  }
+
+  async listChallenges(): Promise<IChallenge[]> {
+    return await this.challengeModel
+      .find()
+      .populate('challenger')
+      .populate('players')
+      .populate('match')
+      .exec();
+  }
+
   private async playersExist(players: IPlayer[]): Promise<void> {
     await Promise.all(
       players.map(async (player) => {
