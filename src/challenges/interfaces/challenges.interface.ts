@@ -12,10 +12,21 @@ export interface IChallenge extends Document {
   match: string;
 }
 
+export interface IMatch extends Document {
+  def: IPlayer;
+  result: IResult;
+  players: IPlayer[];
+  category: string;
+}
+
+export interface IResult {
+  set: string;
+}
+
 export enum ChallengeStatus {
   DONE = 'DONE',
   PENDING = 'PENDING',
-  ACCEPT = 'ACCEPT',
+  ACCEPTED = 'ACCEPTED',
   NEGATED = 'NEGATED',
   CANCELED = 'CANCELED',
 }
