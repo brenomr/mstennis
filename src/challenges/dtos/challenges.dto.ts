@@ -4,8 +4,10 @@ import {
   IsArray,
   IsDateString,
   IsNotEmpty,
+  IsOptional,
 } from 'class-validator';
 import { IPlayer } from 'src/players/interfaces/players.interface';
+import { ChallengeStatus } from '../interfaces/challenges.interface';
 
 export class CreateChallengeDto {
   @IsNotEmpty()
@@ -19,4 +21,13 @@ export class CreateChallengeDto {
   @ArrayMaxSize(2)
   @ArrayMinSize(2)
   players: Array<IPlayer>;
+}
+
+export class UpdateChallengeDto {
+  @IsOptional()
+  @IsDateString()
+  challengeDate: Date;
+
+  @IsOptional()
+  status: ChallengeStatus;
 }

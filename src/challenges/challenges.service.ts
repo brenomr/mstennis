@@ -1,10 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CategoriesService } from 'src/categories/categories.service';
 import { IPlayer } from 'src/players/interfaces/players.interface';
 import { PlayersService } from 'src/players/players.service';
-import { CreateChallengeDto } from './dtos/challenges.dto';
+import { CreateChallengeDto, UpdateChallengeDto } from './dtos/challenges.dto';
 import { ChallengeStatus, IChallenge } from './interfaces/challenges.interface';
 
 @Injectable()
@@ -58,6 +62,27 @@ export class ChallengesService {
       .exec();
   }
 
+  async updateChallenge(
+    _id: string,
+    challengeData: UpdateChallengeDto,
+  ): Promise<void> {
+    const challengeFound = await this.getChallenge(_id);
+
+    if (
+      challengeData.status &&
+      challengeData.status !== challengeFound.status
+    ) {
+      challengeFound.responseDate = new Date();
+      challengeFound.status = challengeData.status;
+    }
+    if (challengeData.challengeDate)
+      challengeFound.challengeDate = challengeData.challengeDate;
+
+    await this.challengeModel
+      .findOneAndUpdate({ _id }, { $set: challengeFound })
+      .exec();
+  }
+
   private async playersExist(players: IPlayer[]): Promise<void> {
     await Promise.all(
       players.map(async (player) => {
@@ -75,5 +100,13 @@ export class ChallengesService {
       throw new BadRequestException(
         `The challenger need to be one player of the match!`,
       );
+  }
+
+  private async getChallenge(_id: string): Promise<IChallenge> {
+    const challengeFound = await this.challengeModel.findById(_id).exec();
+    if (!challengeFound) {
+      throw new NotFoundException(`Challenge with id ${_id}, doesn't exist!`);
+    }
+    return challengeFound;
   }
 }

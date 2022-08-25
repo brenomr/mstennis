@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
-import { CreateChallengeDto } from './dtos/challenges.dto';
+import { CreateChallengeDto, UpdateChallengeDto } from './dtos/challenges.dto';
+import { ValidateChallengeStatusPipe } from './pipes/validate-challenge-status.pipe';
 
 @Controller('api/v1/challenges')
 export class ChallengesController {
@@ -16,5 +17,13 @@ export class ChallengesController {
     return playerId
       ? await this.challengesService.getChallengesByPlayerId(playerId)
       : await this.challengesService.listChallenges();
+  }
+
+  @Put('/:challengeId')
+  async updateChallenge(
+    @Param('challengeId') _id: string,
+    @Body(ValidateChallengeStatusPipe) challengeData: UpdateChallengeDto,
+  ) {
+    return await this.challengesService.updateChallenge(_id, challengeData);
   }
 }
