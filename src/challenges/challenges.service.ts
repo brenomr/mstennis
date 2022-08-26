@@ -94,9 +94,9 @@ export class ChallengesService {
   async matchResult(_id: string, matchData: MatchResultDto): Promise<void> {
     const challengeFound = await this.getChallenge(_id);
 
-    const playerFound = challengeFound.players.filter((player) => {
-      player._id == matchData.def;
-    });
+    const playerFound = challengeFound.players.filter(
+      (player) => player._id == matchData.def,
+    );
 
     if (playerFound.length == 0)
       throw new BadRequestException(`The winner isn't on the match!`);
