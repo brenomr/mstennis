@@ -123,6 +123,14 @@ export class ChallengesService {
     }
   }
 
+  async deleteChallenge(_id: string): Promise<void> {
+    const challengeFound = await this.getChallenge(_id);
+    challengeFound.status = ChallengeStatus.CANCELED;
+    await this.challengeModel
+      .findOneAndUpdate({ _id }, { $set: challengeFound })
+      .exec();
+  }
+
   private async playersExist(players: IPlayer[]): Promise<void> {
     await Promise.all(
       players.map(async (player) => {
