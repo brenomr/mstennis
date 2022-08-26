@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,13 +10,20 @@ import { CategoriesService } from 'src/categories/categories.service';
 import { IPlayer } from 'src/players/interfaces/players.interface';
 import { PlayersService } from 'src/players/players.service';
 import { CreateChallengeDto, UpdateChallengeDto } from './dtos/challenges.dto';
-import { ChallengeStatus, IChallenge } from './interfaces/challenges.interface';
+import { MatchResultDto } from './dtos/match.dto';
+import {
+  ChallengeStatus,
+  IChallenge,
+  IMatch,
+} from './interfaces/challenges.interface';
 
 @Injectable()
 export class ChallengesService {
   constructor(
     @InjectModel('Challenge')
     private readonly challengeModel: Model<IChallenge>,
+    @InjectModel('Match')
+    private readonly matchModel: Model<IMatch>,
     private readonly playerService: PlayersService,
     private readonly categoryService: CategoriesService,
   ) {}
@@ -81,6 +89,38 @@ export class ChallengesService {
     await this.challengeModel
       .findOneAndUpdate({ _id }, { $set: challengeFound })
       .exec();
+  }
+
+  async matchResult(_id: string, matchData: MatchResultDto): Promise<void> {
+    const challengeFound = await this.getChallenge(_id);
+
+    const playerFound = challengeFound.players.filter((player) => {
+      player._id == matchData.def;
+    });
+
+    if (playerFound.length == 0)
+      throw new BadRequestException(`The winner isn't on the match!`);
+
+    const createdMatch = new this.matchModel(matchData);
+
+    createdMatch.category = challengeFound.category;
+    createdMatch.players = challengeFound.players;
+
+    const { _id: matchId } = await createdMatch.save();
+
+    challengeFound.status = ChallengeStatus.DONE;
+    challengeFound.match = matchId;
+
+    try {
+      await this.challengeModel
+        .findOneAndUpdate({ _id }, { $set: challengeFound })
+        .exec();
+    } catch (error) {
+      await this.matchModel.deleteOne({ _id: matchId }).exec();
+      throw new InternalServerErrorException(
+        `Could not save the match result!`,
+      );
+    }
   }
 
   private async playersExist(players: IPlayer[]): Promise<void> {

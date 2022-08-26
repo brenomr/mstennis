@@ -9,12 +9,12 @@ export interface IChallenge extends Document {
   challenger: IPlayer;
   category: string;
   players: Array<IPlayer>;
-  match: string;
+  match: IMatch;
 }
 
 export interface IMatch extends Document {
   def: IPlayer;
-  result: IResult;
+  result: IResult[];
   players: IPlayer[];
   category: string;
 }
